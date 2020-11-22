@@ -12,7 +12,7 @@ $(document).ready(function(){
     })
     function videoSearch(key,search,maxResults){
 
-        $("video").empty();
+        $("#video").empty();
         $.get("https://www.googleapis.com/youtube/v3/search?key="+key+
         "&type=video&part=snippet&maxResults="+maxResults+"&q="+search,function(data){
             console.log(data)
@@ -29,6 +29,7 @@ $(document).ready(function(){
             
                 
             });
-        })  
+        })
+    
     }
 })

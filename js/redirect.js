@@ -1,5 +1,6 @@
 $(document).ready(function(){
-    var redirect_uri = "http://localhost:1234/redirect.html";
+    //var redirect_uri = "http://localhost:1234/redirect.html";
+    var redirect_uri = "http://playlounge-search.herokuapp.com/redirect.html"
     var client_id = "1064710241183-09tdvsnm4th6dokv8d84sr4ft2jhh904.apps.googleusercontent.com"
     var scope = "https://www.googleapis.com/auth/youtube";
     var client_secret = "67sGneJMFickdSp5aH_LHA6y";
