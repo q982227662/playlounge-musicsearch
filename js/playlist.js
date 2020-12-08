@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  
+    
     var API_KEY= "AIzaSyC5ln_nE3PNS2MvmgAu4cB0YGDd49Rke8w"
     //var redirect_uri = "http://localhost:1234/redirect.html";
     var redirect_uri = "http://playlounge-search.herokuapp.com/redirect.html";
@@ -15,6 +15,5 @@ $(document).ready(function(){
         +"&prompt=consent&response_type=code&client_id="+client_id+"&scope="+scope
         +"&access_type=offline";
         window.location = url;
-    }
-    
+    } 
 });

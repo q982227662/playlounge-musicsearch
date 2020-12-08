@@ -1,4 +1,4 @@
-/*const fetchJsonp = require("fetch-jsonp");
+const fetchJsonp = require("fetch-jsonp");
 
 //import validtion and showAlert
 import { showAlert, isEmpty } from "./validation";
@@ -66,4 +66,4 @@ function showMusic(musics){
         </div>`;
         results.appendChild(div);
     }
-}*/
+}
