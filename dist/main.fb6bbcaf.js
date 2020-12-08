@@ -117,223 +117,75 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../../node_modules/fetch-jsonp/build/fetch-jsonp.js":[function(require,module,exports) {
-var define;
-var global = arguments[3];
-(function (global, factory) {
-  if (typeof define === 'function' && define.amd) {
-    define(['exports', 'module'], factory);
-  } else if (typeof exports !== 'undefined' && typeof module !== 'undefined') {
-    factory(exports, module);
-  } else {
-    var mod = {
-      exports: {}
-    };
-    factory(mod.exports, mod);
-    global.fetchJsonp = mod.exports;
-  }
-})(this, function (exports, module) {
-  'use strict';
+})({"js/main.js":[function(require,module,exports) {
+$(document).ready(function () {
+  var databaseurl = "http://178.128.180.197:5000/song/add";
+  var video = '';
+  var tempURL = "https://google.com";
+  var tempArtist = "asd";
+  var tempId = "asd";
+  var tempName = "tests";
+  $("#search-form").submit(function (event) {
+    event.preventDefault();
+    var search = $("#search-text").val();
+    videoSearch(search);
+  }); //   $("#button").on('click',function(){
+  //})
 
-  var defaultOptions = {
-    timeout: 5000,
-    jsonpCallback: 'callback',
-    jsonpCallbackFunction: null
-  };
+  function videoSearch(search) {
+    $.ajax({
+      url: "https://itunes.apple.com/search?term=" + search,
+      dataType: "jsonp",
+      success: function success(response) {
+        console.log(response); //clear results
 
-  function generateCallbackFunction() {
-    return 'jsonp_' + Date.now() + '_' + Math.ceil(Math.random() * 100000);
-  }
+        results.innerHTML = ''; // loop through every music in the element by checking the song
 
-  function clearFunction(functionName) {
-    // IE8 throws an exception when you try to delete a property on window
-    // http://stackoverflow.com/a/1824228/751089
-    try {
-      delete window[functionName];
-    } catch (e) {
-      window[functionName] = undefined;
-    }
-  }
+        if (results.count === 0) {
+          showAlert('Nothing Found!', 'danger');
+          return;
+        }
 
-  function removeScript(scriptId) {
-    var script = document.getElementById(scriptId);
-    if (script) {
-      document.getElementsByTagName('head')[0].removeChild(script);
-    }
-  }
+        var integer = 0;
+        var outputs = document.querySelector("#results");
+        outputs.innerHTML = '';
+        response.results.forEach(function (results) {
+          //clear results
+          // loop through every music in the element by checking the song
+          var temp = {
+            name: results.trackName,
+            artist: results.artistName,
+            url: results.previewUrl
+          };
+          var div = document.createElement("div");
+          div.classList.add("card");
+          div.innerHTML = "           \n                        <img class=\"card-img-top\" src=".concat(results.artworkUrl100, " alt=\"Album Artwork\">\n                        <div class=\"card-body\" >\n                          <h5 class=\"card-title\">").concat(results.trackName, "</h5>\n                          <p class=\"card-text\">").concat(results.artistName, "</p>\n                        </div>\n                        <ul class=\"list-group list-group-flush\">\n                          <li class=\"list-group-item\">").concat(results.collectionName, "</li>\n                          <li class=\"list-group-item\">").concat(results.primaryGenreName, " . ").concat(results.releaseDate.split('-', 1), "</li>\n                \n                          <li class=\"list-group-item\">sample: <br>\n                                <audio src =").concat(results.previewUrl, " controls='controls'>\n                                </audio></li>\n                          <li class=\"list-group-item\">\n                             <button id =").concat(integer, " type=\"button\" class=\"btn btn-primary btn-sm\">Add</button>                \n                          </li>\n                          \n                        </ul>\n                        <div class=\"card-body\">\n                          <a href=").concat(results.trackViewUrl, " class=\"card-link\">Show in itunes</a>\n                        </div>");
+          /*$(document).on('click',integer,function(){
+              console.log(integer);
+              $.ajax({
+                  type: "POST",
+                  contentType:"application/json",
+                  url: "https://playlounge-backend.herokuapp.com/song/add",
+                  data: JSON.stringify(temp),
+                  dataType: "JSON",
+                  success: function(data) {
+                      alert(integer);
+                  },
+                  error: function(data){
+                      alert("fail");
+                  }
+              });
+          })
+          integer = integer + 1; 
+          */
 
-  function fetchJsonp(_url) {
-    var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-    // to avoid param reassign
-    var url = _url;
-    var timeout = options.timeout || defaultOptions.timeout;
-    var jsonpCallback = options.jsonpCallback || defaultOptions.jsonpCallback;
-
-    var timeoutId = undefined;
-
-    return new Promise(function (resolve, reject) {
-      var callbackFunction = options.jsonpCallbackFunction || generateCallbackFunction();
-      var scriptId = jsonpCallback + '_' + callbackFunction;
-
-      window[callbackFunction] = function (response) {
-        resolve({
-          ok: true,
-          // keep consistent with fetch API
-          json: function json() {
-            return Promise.resolve(response);
-          }
+          outputs.appendChild(div);
         });
-
-        if (timeoutId) clearTimeout(timeoutId);
-
-        removeScript(scriptId);
-
-        clearFunction(callbackFunction);
-      };
-
-      // Check if the user set their own params, and if not add a ? to start a list of params
-      url += url.indexOf('?') === -1 ? '?' : '&';
-
-      var jsonpScript = document.createElement('script');
-      jsonpScript.setAttribute('src', '' + url + jsonpCallback + '=' + callbackFunction);
-      if (options.charset) {
-        jsonpScript.setAttribute('charset', options.charset);
       }
-      jsonpScript.id = scriptId;
-      document.getElementsByTagName('head')[0].appendChild(jsonpScript);
-
-      timeoutId = setTimeout(function () {
-        reject(new Error('JSONP request to ' + _url + ' timed out'));
-
-        clearFunction(callbackFunction);
-        removeScript(scriptId);
-        window[callbackFunction] = function () {
-          clearFunction(callbackFunction);
-        };
-      }, timeout);
-
-      // Caught if got 404/500
-      jsonpScript.onerror = function () {
-        reject(new Error('JSONP request to ' + _url + ' failed'));
-
-        clearFunction(callbackFunction);
-        removeScript(scriptId);
-        if (timeoutId) clearTimeout(timeoutId);
-      };
     });
   }
-
-  // export as global function
-  /*
-  let local;
-  if (typeof global !== 'undefined') {
-    local = global;
-  } else if (typeof self !== 'undefined') {
-    local = self;
-  } else {
-    try {
-      local = Function('return this')();
-    } catch (e) {
-      throw new Error('polyfill failed because global object is unavailable in this environment');
-    }
-  }
-  local.fetchJsonp = fetchJsonp;
-  */
-
-  module.exports = fetchJsonp;
 });
-},{}],"js/validation.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.isEmpty = isEmpty;
-exports.showAlert = showAlert;
-
-//export const isEmpty = value =>value.trim().length === 0 ;
-function isEmpty(value) {
-  var test = value.trim().length === 0;
-  return test;
-}
-
-function showAlert(message, className) {
-  //Create a div
-  var div = document.createElement("div"); //Add classes
-
-  div.className = "alert alert-".concat(className); //Add text
-
-  div.appendChild(document.createTextNode(message)); //Get jumbotron
-
-  var jumbotron = document.querySelector("#jumbotron"); //Get form div 
-
-  var form = document.querySelector("#form-div"); //Insert Alert
-
-  jumbotron.insertBefore(div, form);
-  setTimeout(function () {
-    return document.querySelector('.alert').remove();
-  }, 3000);
-}
-},{}],"js/main.js":[function(require,module,exports) {
-"use strict";
-
-var _validation = require("./validation");
-
-var fetchJsonp = require("fetch-jsonp"); //import validtion and showAlert
-
-
-// Get searchform element 
-var searchForm = document.querySelector("#search-form"); //Submit search form
-
-searchForm.addEventListener("submit", fetchMusic); //Fetch music data from Apple music APi
-
-function fetchMusic(e) {
-  e.preventDefault();
-  var searchText = document.querySelector("#search-text").value;
-
-  if ((0, _validation.isEmpty)(searchText)) {
-    (0, _validation.showAlert)("Please search something.", "warning");
-    return;
-  }
-
-  var fetchUrl = "https://itunes.apple.com/search?term=".concat(searchText);
-  fetchJsonp(fetchUrl).then(function (res) {
-    return res.json();
-  }).then(function (data) {
-    return showMusic(data.results);
-  }).catch(function (err) {
-    return console.log(err);
-  });
-} //show each music in a format of card
-
-
-function showMusic(musics) {
-  console.log(musics);
-  var results = document.querySelector("#results");
-
-  if (musics.length === 0) {
-    (0, _validation.showAlert)('Nothing Found!', 'danger');
-    return;
-  } //clear results
-
-
-  results.innerHTML = ''; // loop through every music in the element by checking the song
-
-  for (var i = 0; i < musics.length; i++) {
-    var music = musics[i];
-
-    if (music.kind !== "song") {
-      continue;
-    }
-
-    var div = document.createElement("div");
-    div.classList.add("card");
-    div.innerHTML = "<img class=\"card-img-top\" src=".concat(music.artworkUrl100, " alt=\"Album Artwork\">\n        <div class=\"card-body\">\n          <h5 class=\"card-title\">").concat(music.trackName, "</h5>\n          <p class=\"card-text\">").concat(music.artistName, "</p>\n        </div>\n        <ul class=\"list-group list-group-flush\">\n          <li class=\"list-group-item\">").concat(music.collectionName, "</li>\n          <li class=\"list-group-item\">").concat(music.primaryGenreName, " . ").concat(music.releaseDate.split('-', 1), "</li>\n\n          <li class=\"list-group-item\">sample: <br>\n                <audio src =").concat(music.previewUrl, " controls='controls'>\n                </audio></li>\n        </ul>\n        <div class=\"card-body\">\n          <a href=").concat(music.trackViewUrl, " class=\"card-link\">Show in itunes</a>\n\n        </div>");
-    results.appendChild(div);
-  }
-}
-},{"fetch-jsonp":"../../node_modules/fetch-jsonp/build/fetch-jsonp.js","./validation":"js/validation.js"}],"../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{}],"../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -361,7 +213,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52206" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53447" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
